@@ -10,20 +10,16 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger(__name__)
 
-import json
-import math
 import os
 import shutil
-import time
 from datetime import datetime
-
+import youtube_dlc
 from tobrot import (
     DOWNLOAD_LOCATION,
-    AUTH_CHANNEL,
-    SHOULD_USE_BUTTONS
+    TG_MAX_FILE_SIZE
 )
+from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
-from tobrot.helper_funcs.run_shell_command import run_command
 
 
 async def youtube_dl_call_back(bot, update):
@@ -33,8 +29,8 @@ async def youtube_dl_call_back(bot, update):
     tg_send_type, youtube_dl_format, youtube_dl_ext, so_type = cb_data.split("|")
     #
     current_user_id = update.message.reply_to_message.from_user.id
-    current_message_id = update.message.reply_to_message
-    current_message_id = current_message_id.message_id
+    current_message = update.message.reply_to_message
+    current_message_id = current_message.message_id
     current_touched_user_id = update.from_user.id
 
     user_working_dir = os.path.join(
@@ -53,112 +49,75 @@ async def youtube_dl_call_back(bot, update):
             revoke=True
         )
         return
-    save_ytdl_json_path = user_working_dir + \
-        "/" + str("ytdleech") + ".json"
-    try:
-        with open(save_ytdl_json_path, "r", encoding="utf8") as f:
-            response_json = json.load(f)
-        os.remove(save_ytdl_json_path)
-    except FileNotFoundError:
-        await bot.delete_messages(
-            chat_id=update.message.chat.id,
-            message_ids=[
-                update.message.message_id,
-                update.message.reply_to_message.message_id,
-            ],
-            revoke=True
-        )
-        return False
-    #
-    response_json = response_json[0]
-    # TODO: temporary limitations
-    # LOGGER.info(response_json)
-    #
-    youtube_dl_url = response_json.get("webpage_url")
+
+    youtube_dl_url, cf_name, yt_dl_user_name, yt_dl_pass_word = await extract_link(
+        current_message, "YTDL"
+    )
     LOGGER.info(youtube_dl_url)
     #
     custom_file_name = "%(title)s.%(ext)s"
     # https://superuser.com/a/994060
-    LOGGER.info(custom_file_name)
+    # LOGGER.info(custom_file_name)
     #
     await update.message.edit_caption(
         caption="trying to download"
     )
-    description = "@PublicLeech"
-    if "fulltitle" in response_json:
-        fulltitle = response_json["fulltitle"][0:1021]
-        # escape Markdown and special characters
-    if "description" in response_json:
-        description = response_json["description"][0:1021]
-    LOGGER.info(description)
-    #
     tmp_directory_for_each_user = user_working_dir
     download_directory = tmp_directory_for_each_user
     download_directory = os.path.join(
         tmp_directory_for_each_user,
         custom_file_name
     )
-    command_to_exec = []
-    if tg_send_type == "audio":
-        command_to_exec = [
-            "youtube-dlc",
-            "-c",
-            "--prefer-ffmpeg",
-            "--extract-audio",
-            "--audio-format", youtube_dl_ext,
-            "--audio-quality", youtube_dl_format,
-            youtube_dl_url,
-            "-o", download_directory,
-            # "--external-downloader", "aria2c"
-        ]
-    else:
+    ytdl_opts = {
+        "outtmpl": download_directory,
+        "ignoreerrors": True,
+        "nooverwrites": True,
+        "continuedl": True,
+        "noplaylist": True,
+        "max_filesize": TG_MAX_FILE_SIZE,
+    }
+    if yt_dl_user_name and yt_dl_pass_word:
+        ytdl_opts.update({
+            "username": yt_dl_user_name,
+            "password": yt_dl_pass_word,
+        })
+    if "hotstar" in youtube_dl_url:
+        ytdl_opts.update({
+            "geo_bypass_country": "IN",
+        })
+    if tg_send_type == "Audio":
+        ytdl_opts.update({
+            "format": "bestaudio/best",
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": youtube_dl_ext,
+                "preferredquality": youtube_dl_format
+            }, {
+                "key": "FFmpegMetadata"
+            }],
+        })
+    elif tg_send_type == "Video":
         minus_f_format = youtube_dl_format
-
         if "youtu" in youtube_dl_url:
-            for for_mat in response_json["formats"]:
-                format_id = for_mat.get("format_id")
-                if format_id == youtube_dl_format:
-                    acodec = for_mat.get("acodec")
-                    vcodec = for_mat.get("vcodec")
-                    if acodec == "none" or vcodec == "none":
-                        minus_f_format = youtube_dl_format + "+bestaudio"
-                    break
-        elif so_type:
             minus_f_format = youtube_dl_format + "+bestaudio"
 
-        command_to_exec = [
-            "youtube-dlc",
-            "-c",
-            "--embed-subs",
-            "-f", minus_f_format,
-            "--hls-prefer-ffmpeg", youtube_dl_url,
-            "-o", download_directory,
-            # "--external-downloader", "aria2c"
-        ]
-    #
-    command_to_exec.append("--no-warnings")
-    # command_to_exec.append("--quiet")
-    command_to_exec.append("--restrict-filenames")
-    #
-    if "hotstar" in youtube_dl_url:
-        command_to_exec.append("--geo-bypass-country")
-        command_to_exec.append("IN")
-    LOGGER.info(command_to_exec)
+        ytdl_opts.update({
+            "format": minus_f_format,
+            "postprocessors": [{
+                "key": "FFmpegMetadata"
+            }],
+        })
+
     start = datetime.now()
-    t_response, e_response = await run_command(command_to_exec)
-    # Wait for the subprocess to finish
-    # LOGGER.info(e_response)
-    # LOGGER.info(t_response)
-    ad_string_to_replace = "please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version; see  https://yt-dl.org/update  on how to update. Be sure to call youtube-dl with the --verbose flag and include its complete output."
-    if e_response and ad_string_to_replace in e_response:
-        error_message = e_response.replace(ad_string_to_replace, "")
-        await update.message.edit_caption(
-            caption=error_message
-        )
-        return False, None
-    if t_response:
-        # LOGGER.info(t_response)
-        # os.remove(save_ytdl_json_path)
+    with youtube_dlc.YoutubeDL(ytdl_opts) as ytdl:
+        try:
+            info = ytdl.extract_info(youtube_dl_url, download=False)
+            title = info.get("title", None)
+            yt_task = ytdl.download([youtube_dl_url])
+        except youtube_dlc.utils.DownloadError as ytdl_error:
+            await update.message.edit_caption(caption=str(ytdl_error))
+            return False, None
+    if yt_task == 0:
         end_one = datetime.now()
         time_taken_for_download = (end_one - start).seconds
         dir_contents = len(os.listdir(tmp_directory_for_each_user))
@@ -175,7 +134,7 @@ async def youtube_dl_call_back(bot, update):
             user_id,
             {},
             True,
-            fulltitle
+            title
         )
         LOGGER.info(final_response)
         #
