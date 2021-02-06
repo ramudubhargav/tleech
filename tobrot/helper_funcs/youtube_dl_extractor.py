@@ -31,96 +31,73 @@ async def extract_youtube_dl_formats(url, yt_dl_user_name, yt_dl_pass_word, user
     if info:
         ikeyboard = InlineKeyboard()
         #
-        thumb_image = DEF_THUMB_NAIL_VID_S
-        #
-        for current_r_json in info:
-            # LOGGER.info(current_r_json)
-            #
-            thumb_image = current_r_json.get("thumbnails", None)
-            # LOGGER.info(thumb_image)
-            if thumb_image is not None:
-                # YouTube acts weirdly,
-                # and not in the same way as Telegram
-                thumb_image = thumb_image[-1]["url"]
-            if thumb_image is None:
-                thumb_image = DEF_THUMB_NAIL_VID_S
+        thumb_image = info.get("thumbnail", None)
+        # LOGGER.info(thumb_image)
+        # YouTube acts weirdly,
+        # and not in the same way as Telegram
+        thumbnail = thumb_image if thumb_image else DEF_THUMB_NAIL_VID_S
 
-            duration = None
-            if "duration" in current_r_json:
-                duration = current_r_json["duration"]
-            if "formats" in current_r_json:
-                for formats in current_r_json["formats"]:
-                    format_id = formats.get("format_id")
-                    format_string = formats.get("format_note")
-                    if format_string is None:
-                        format_string = formats.get("format")
-                    # don't display formats, without audio
-                    # https://t.me/c/1434259219/269937
-                    if "DASH" in format_string.upper():
-                        continue
-                    format_ext = formats.get("ext")
-                    approx_file_size = ""
-                    if "filesize" in formats:
-                        approx_file_size = humanbytes(formats["filesize"])
-                    n_ue_sc = bool("video only" in format_string)
-                    scneu = "DL" if not n_ue_sc else "XM"
-                    dipslay_str_uon = " " + format_string + " (" + format_ext.upper() + ") " + approx_file_size + " "
-                    cb_string_video = f"video|{format_id}|{format_ext}|{scneu}"
-                    if "drive.google.com" in url:
-                        if format_id == "source":
-                            ikeyboard.row(
-                                    InlineKeyboardButton(
-                                        dipslay_str_uon,
-                                        callback_data=cb_string_video
-                                        )
-                                    )
-                    else:
-                        if format_string and "audio only" not in format_string:
-                            ikeyboard.row(
-                                    InlineKeyboardButton(
-                                        dipslay_str_uon,
-                                        callback_data=cb_string_video
-                                        )
-                                    )
-                        else:
-                            # special weird case :\
-                            ikeyboard.row(
-                                    InlineKeyboardButton(
-                                        f"SVideo ({approx_file_size})",
-                                        callback_data=cb_string_video
-                                        )
-                                    )
-                if duration is not None:
-                    cb_string_64 = "audio|64k|mp3"
-                    cb_string_128 = "audio|128k|mp3"
-                    cb_string = "audio|320k|mp3"
-                    ikeyboard.row(
+        duration = info.get("duration", None)
+        if info.get("formats"):
+            for formats in info.get("formats"):
+                format_id = formats.get("format_id")
+                format_string = formats.get("format_note")
+                if format_string is None:
+                    format_string = formats.get("format")
+                # don't display formats, without audio
+                # https://t.me/c/1434259219/269937
+                if "DASH" in format_string.upper():
+                    continue
+                format_ext = formats.get("ext")
+                approx_file_size = humanbytes(formats.get("filesize")) if formats.get("filesize") else ""
+                n_ue_sc = bool("video only" in format_string)
+                scneu = "DL" if not n_ue_sc else "XM"
+                dipslay_str_uon = " " + format_string + " (" + format_ext.upper() + ") " + approx_file_size + " "
+                cb_string_video = f"video|{format_id}|{format_ext}|{scneu}"
+                if "drive.google.com" in url:
+                    if format_id == "source":
+                        ikeyboard.row(
                             InlineKeyboardButton(
-                                "MP3 (64 kbps)",
-                                callback_data=cb_string_64
-                                ),
-                            InlineKeyboardButton(
-                                "MP3 (128 kbps)",
-                                callback_data=cb_string_128
-                                ))
-                    ikeyboard.row(
-                            InlineKeyboardButton(
-                                "MP3 (320 kbps)",
-                                callback_data=cb_string
+                                dipslay_str_uon,
+                                callback_data=cb_string_video
                             ))
-            else:
-                format_id = current_r_json["format_id"]
-                format_ext = current_r_json["ext"]
-                cb_string_video = f"video|{format_id}|{format_ext}|DL"
+                else:
+                    if format_string and "audio only" not in format_string:
+                        ikeyboard.row(
+                            InlineKeyboardButton(
+                                dipslay_str_uon,
+                                callback_data=cb_string_video
+                            ))
+                    else:
+                        # special weird case :\
+                        ikeyboard.row(
+                            InlineKeyboardButton(
+                                f"SVideo ({approx_file_size})",
+                                callback_data=cb_string_video
+                            ))
+            if duration:
                 ikeyboard.row(
-                        InlineKeyboardButton(
-                            "SVideo",
-                            callback_data=cb_string_video
-                            )
-                        )
-            # TODO: :\
-            break
+                    InlineKeyboardButton(
+                        "MP3 (64 kbps)",
+                        callback_data="audio|64k|mp3"
+                    ),
+                    InlineKeyboardButton(
+                        "MP3 (128 kbps)",
+                        callback_data="audio|128k|mp3"
+                    ))
+                ikeyboard.row(
+                    InlineKeyboardButton(
+                        "MP3 (320 kbps)",
+                        callback_data="audio|320k|mp3"
+                    ))
+        else:
+            format_id = info.get("format_id", None)
+            format_ext = info.get("ext", None)
+            ikeyboard.row(
+                InlineKeyboardButton(
+                    "SVideo",
+                    callback_data=f"video|{format_id}|{format_ext}|DL"
+                ))
         # LOGGER.info(ikeyboard)
-        succss_mesg = """Select the desired format: 👇
-<u>mentioned</u> <i>file size might be approximate</i>"""
-        return thumb_image, succss_mesg, ikeyboard
+    succss_mesg = "Select the desired format: 👇<br> <u>mentioned</u> <i>file size might be approximate</i>"
+    return thumbnail, succss_mesg, ikeyboard
