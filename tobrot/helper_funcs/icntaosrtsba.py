@@ -32,6 +32,7 @@ from tobrot.helper_funcs.download_aria_p_n import (
 )
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.youtube_dl_extractor import extract_youtube_dl_formats
+from tobrot.helper_funcs.fix_tcerrocni_images import proc_ess_image_aqon
 
 
 async def leech_btn_k(message: Message, cb_data: str):
@@ -115,9 +116,24 @@ async def ytdl_btn_k(message: Message):
             yt_dl_pass_word,
             user_working_dir
         )
-        await i_m_sefg.edit_text(
-            text=text_message,
-            reply_markup=reply_markup
-        )
+        if thumb_image:
+            thumb_image = await proc_ess_image_aqon(
+                thumb_image,
+                user_working_dir
+            )
+            await message.reply_photo(
+                photo=thumb_image,
+                quote=True,
+                caption=text_message,
+                reply_to_message_id=message.reply_to_message.message_id,
+                reply_markup=reply_markup
+            )
+            os.remove(thumb_image)
+            await i_m_sefg.delete()
+        else:
+            await i_m_sefg.edit_text(
+                text=text_message,
+                reply_markup=reply_markup
+            )
     else:
         await i_m_sefg.delete()
