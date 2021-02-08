@@ -99,7 +99,7 @@ async def youtube_dl_call_back(bot, update):
     elif tg_send_type == "video":
         minus_f_format = youtube_dl_format
         if "youtu" in youtube_dl_url:
-            minus_f_format = youtube_dl_format + "+bestaudio"
+            minus_f_format = f"{youtube_dl_format}+bestaudio"
 
         ytdl_opts.update({
             "format": minus_f_format,

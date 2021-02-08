@@ -51,7 +51,7 @@ async def extract_youtube_dl_formats(url, yt_dl_user_name, yt_dl_pass_word, user
                 approx_file_size = humanbytes(formats.get("filesize")) if formats.get("filesize") else ""
                 n_ue_sc = bool("video only" in format_string)
                 scneu = "DL" if not n_ue_sc else "XM"
-                dipslay_str_uon = " " + format_string + " (" + format_ext.upper() + ") " + approx_file_size + " "
+                dipslay_str_uon = f"{format_string} [{format_ext.upper()}] {approx_file_size}"
                 cb_string_video = f"video|{format_id}|{format_ext}|{scneu}"
                 if "drive.google.com" in url:
                     if format_id == "source":
@@ -78,16 +78,16 @@ async def extract_youtube_dl_formats(url, yt_dl_user_name, yt_dl_pass_word, user
                 ikeyboard.row(
                     InlineKeyboardButton(
                         "MP3 (64 kbps)",
-                        callback_data="audio|64k|mp3|_"
+                        callback_data="audio|64|mp3|_"
                     ),
                     InlineKeyboardButton(
                         "MP3 (128 kbps)",
-                        callback_data="audio|128k|mp3|_"
+                        callback_data="audio|128|mp3|_"
                     ))
                 ikeyboard.row(
                     InlineKeyboardButton(
                         "MP3 (320 kbps)",
-                        callback_data="audio|320k|mp3|_"
+                        callback_data="audio|320|mp3|_"
                     ))
         else:
             format_id = info.get("format_id", None)
