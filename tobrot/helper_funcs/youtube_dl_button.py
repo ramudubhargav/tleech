@@ -56,6 +56,9 @@ async def youtube_dl_call_back(bot, update):
     LOGGER.info(youtube_dl_url)
     #
     custom_file_name = "%(title)s.%(ext)s"
+    # Assign custom filename if specified
+    if cf_name:
+        custom_file_name = f"{cf_name}.%(ext)s"
     # https://superuser.com/a/994060
     # LOGGER.info(custom_file_name)
     #
@@ -112,7 +115,6 @@ async def youtube_dl_call_back(bot, update):
     with youtube_dlc.YoutubeDL(ytdl_opts) as ytdl:
         try:
             info = ytdl.extract_info(youtube_dl_url, download=False)
-            title = info.get("title", None)
             yt_task = ytdl.download([youtube_dl_url])
         except youtube_dlc.utils.DownloadError as ytdl_error:
             await update.message.edit_caption(caption=str(ytdl_error))
@@ -134,7 +136,7 @@ async def youtube_dl_call_back(bot, update):
             user_id,
             {},
             True,
-            title
+            cf_name if cf_name else info.get("title", None)
         )
         LOGGER.info(final_response)
         #
