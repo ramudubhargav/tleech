@@ -134,18 +134,16 @@ async def fake_etairporpa_call(
             required_remote = remote_names[r_clone_header_xedni]
         except IndexError:
             return False, "maybe a bug, but index seems not valid"
-        remote_file_id = await copy_via_rclone(
+        remote_file_link = await copy_via_rclone(
             to_upload_file,
             required_remote,
             R_CLONE_DEST,  # rclone destination folder
             r_clone_conf_file
         )
-        # temporary hard coded id for Google Drive only. :\
-        # TODO
         await sent_message_to_update_tg_p.reply_text(
             "files might be uploaded in the desired remote "
             "please check Logs for any errors"
-            f"\n\nhttps://drive.google.com/open?id={remote_file_id}"
+            f"\n\n{remote_file_link}"
         )
         return True, None
 

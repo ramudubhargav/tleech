@@ -43,12 +43,14 @@ async def copy_via_rclone(
     remote_dir: str,
     conf_file: str
 ):
+    if os.path.isdir(src):
+        remote_dir = f"{remote_dir}/{src}"
     command_to_exec = [
         "rclone",
         "move",
         src,
-        "" + remote_name + ":" + remote_dir + "",
-        "--config=" + conf_file + "",
+        f"{remote_name}:{remote_dir}",
+        f"--config={conf_file}",
         "--fast-list",
         "--transfers", "18",
         "--checkers", "10",
@@ -60,14 +62,14 @@ async def copy_via_rclone(
     LOGGER.info(e_response)
     LOGGER.info(t_response)
     # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
-    remote_file_id = await r_clone_extract_link_s(
+    remote_file_link = await r_clone_extract_link_s(
         re.escape(src),
         remote_name,
         remote_dir,
         conf_file
     )
-    LOGGER.info(remote_file_id)
-    return remote_file_id
+    LOGGER.info(remote_file_link)
+    return remote_file_link
 
 
 async def get_r_clone_config(message_link: str, py_client: Client) -> str:
@@ -111,23 +113,16 @@ async def r_clone_extract_link_s(
     remote_dir: str,
     conf_file: str
 ):
-    tmp_file_name = "lsf_filter.txt"
-    with open(tmp_file_name, "w+", encoding="utf-8") as f_d:
-        f_d.write(f"+ {src_file_name}\n- *")
+    # TODO: Need to fix file linking for individual files
     command_to_exec = [
         "rclone",
-        "lsf",
-        "-F",
-        "-i",
-        f"--filter-from={tmp_file_name}",
-        "--files-only",
-        "" + remote_name + ":" + remote_dir + "",
-        "--config=" + conf_file + ""
+        "link",
+        f"{remote_name}:{remote_dir}",
+        f"--config={conf_file}"
     ]
     LOGGER.info(command_to_exec)
     t_response, e_response = await run_command(command_to_exec)
     # Wait for the subprocess to finish
     LOGGER.info(e_response)
     LOGGER.info(t_response)
-    os.remove(tmp_file_name)
     return t_response
