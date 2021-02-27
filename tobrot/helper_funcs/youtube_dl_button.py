@@ -4,9 +4,9 @@
 
 # the logging things
 import logging
+
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 LOGGER = logging.getLogger(__name__)
 
@@ -14,10 +14,7 @@ import os
 import shutil
 from datetime import datetime
 import yt_dlp
-from tobrot import (
-    DOWNLOAD_LOCATION,
-    TG_MAX_FILE_SIZE
-)
+from tobrot import DOWNLOAD_LOCATION, TG_MAX_FILE_SIZE
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 
@@ -36,7 +33,7 @@ async def youtube_dl_call_back(bot, update):
     user_working_dir = os.path.join(
         DOWNLOAD_LOCATION,
         str(current_user_id),
-        str(update.message.reply_to_message.message_id)
+        str(update.message.reply_to_message.message_id),
     )
     # create download directory, if not exist
     if not os.path.isdir(user_working_dir):
@@ -46,7 +43,7 @@ async def youtube_dl_call_back(bot, update):
                 update.message.message_id,
                 update.message.reply_to_message.message_id,
             ],
-            revoke=True
+            revoke=True,
         )
         return
 
@@ -62,15 +59,10 @@ async def youtube_dl_call_back(bot, update):
     # https://superuser.com/a/994060
     # LOGGER.info(custom_file_name)
     #
-    await update.message.edit_caption(
-        caption="trying to download"
-    )
+    await update.message.edit_caption(caption="trying to download")
     tmp_directory_for_each_user = user_working_dir
     download_directory = tmp_directory_for_each_user
-    download_directory = os.path.join(
-        tmp_directory_for_each_user,
-        custom_file_name
-    )
+    download_directory = os.path.join(tmp_directory_for_each_user, custom_file_name)
     ytdl_opts = {
         "outtmpl": download_directory,
         "ignoreerrors": True,
@@ -80,45 +72,54 @@ async def youtube_dl_call_back(bot, update):
         "max_filesize": TG_MAX_FILE_SIZE,
     }
     if yt_dl_user_name and yt_dl_pass_word:
-        ytdl_opts.update({
-            "username": yt_dl_user_name,
-            "password": yt_dl_pass_word,
-        })
+        ytdl_opts.update(
+            {
+                "username": yt_dl_user_name,
+                "password": yt_dl_pass_word,
+            }
+        )
     if extractor_key == "HotStar":
-        ytdl_opts.update({
-            "geo_bypass_country": "IN",
-        })
+        ytdl_opts.update(
+            {
+                "geo_bypass_country": "IN",
+            }
+        )
     if tg_send_type == "audio":
-        ytdl_opts.update({
-            "format": "bestaudio/best",
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": acodec,
-                "preferredquality": youtube_dl_format
-            }, {
-                "key": "FFmpegMetadata"
-            }],
-        })
+        ytdl_opts.update(
+            {
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": acodec,
+                        "preferredquality": youtube_dl_format,
+                    },
+                    {"key": "FFmpegMetadata"},
+                ],
+            }
+        )
     elif tg_send_type == "video":
         # recreating commit 20b0ef4 in a confusing way
         final_format = youtube_dl_format
-        # GDrive check, it doesn't accept "bestaudio" value 
+        # GDrive check, it doesn't accept "bestaudio" value
         if extractor_key == "GoogleDrive":
             final_format = youtube_dl_format
         elif extractor_key == "Youtube":
             if acodec == "None":
                 final_format = f"{youtube_dl_format}+bestaudio"
-        ytdl_opts.update({
-            "format": final_format,
-            "postprocessors": [{
-                "key": "FFmpegMetadata"
-            }],
-        })
+        ytdl_opts.update(
+            {
+                "format": final_format,
+                "postprocessors": [{"key": "FFmpegMetadata"}],
+            }
+        )
 
     start = datetime.now()
     with yt_dlp.YoutubeDL(ytdl_opts) as ytdl:
         try:
-            info = ytdl.extract_info(youtube_dl_url, download=True, ie_key=extractor_key)
+            info = ytdl.extract_info(
+                youtube_dl_url, download=True, ie_key=extractor_key
+            )
         except yt_dlp.utils.DownloadError as ytdl_error:
             await update.message.edit_caption(caption=str(ytdl_error))
             return False, None
@@ -129,7 +130,7 @@ async def youtube_dl_call_back(bot, update):
         # dir_contents.sort()
         await update.message.edit_caption(
             caption=f"Download completed in {time_taken_for_download} seconds"
-                    f"\nfound {dir_contents} file(s)"
+            f"\nfound {dir_contents} file(s)"
         )
         user_id = update.from_user.id
         #
@@ -139,7 +140,7 @@ async def youtube_dl_call_back(bot, update):
             user_id,
             {},
             True,
-            cf_name if cf_name else info.get("title", None)
+            cf_name if cf_name else info.get("title", None),
         )
         LOGGER.info(final_response)
         #

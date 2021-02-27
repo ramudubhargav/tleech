@@ -17,18 +17,11 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import time
-from pyrogram.types import (
-    Message
-)
-from tobrot import (
-    aria2,
-    LOGGER,
-    DOWNLOAD_LOCATION
-)
+from pyrogram.types import Message
+from tobrot import aria2, LOGGER, DOWNLOAD_LOCATION
 from tobrot.helper_funcs.download_aria_p_n import (
     call_apropriate_function,
-    fake_etairporpa_call
+    fake_etairporpa_call,
 )
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.youtube_dl_extractor import extract_youtube_dl_formats
@@ -37,9 +30,7 @@ from tobrot.helper_funcs.fix_tcerrocni_images import proc_ess_image_aqon
 
 async def leech_btn_k(message: Message, cb_data: str):
     # get link from the incoming message
-    dl_url, cf_name, _, _ = await extract_link(
-        message.reply_to_message, "LEECH"
-    )
+    dl_url, cf_name, _, _ = await extract_link(message.reply_to_message, "LEECH")
     LOGGER.info(dl_url)
     LOGGER.info(cf_name)
     current_user_id = message.reply_to_message.from_user.id
@@ -47,7 +38,7 @@ async def leech_btn_k(message: Message, cb_data: str):
     new_download_location = os.path.join(
         DOWNLOAD_LOCATION,
         str(current_user_id),
-        str(message.reply_to_message.message_id)
+        str(message.reply_to_message.message_id),
     )
     # create download directory, if not exist
     if not os.path.isdir(new_download_location):
@@ -76,11 +67,7 @@ async def leech_btn_k(message: Message, cb_data: str):
             await message.edit_text("trying to download")
             # try to download the "link"
             sagtus, err_message = await call_apropriate_function(
-                aria2,
-                dl_url,
-                new_download_location,
-                message,
-                is_zip
+                aria2, dl_url, new_download_location, message, is_zip
             )
             if not sagtus:
                 # if FAILED, display the error message
@@ -102,7 +89,7 @@ async def ytdl_btn_k(message: Message):
         user_working_dir = os.path.join(
             DOWNLOAD_LOCATION,
             str(current_user_id),
-            str(message.reply_to_message.message_id)
+            str(message.reply_to_message.message_id),
         )
         # create download directory, if not exist
         if not os.path.isdir(user_working_dir):
@@ -114,26 +101,20 @@ async def ytdl_btn_k(message: Message):
             # cf_name,
             yt_dl_user_name,
             yt_dl_pass_word,
-            user_working_dir
+            user_working_dir,
         )
         if thumb_image:
-            thumb_image = await proc_ess_image_aqon(
-                thumb_image,
-                user_working_dir
-            )
+            thumb_image = await proc_ess_image_aqon(thumb_image, user_working_dir)
             await message.reply_photo(
                 photo=thumb_image,
                 quote=True,
                 caption=text_message,
                 reply_to_message_id=message.reply_to_message.message_id,
-                reply_markup=reply_markup
+                reply_markup=reply_markup,
             )
             os.remove(thumb_image)
             await i_m_sefg.delete()
         else:
-            await i_m_sefg.edit_text(
-                text=text_message,
-                reply_markup=reply_markup
-            )
+            await i_m_sefg.edit_text(text=text_message, reply_markup=reply_markup)
     else:
         await i_m_sefg.delete()

@@ -22,27 +22,18 @@ from typing import Union
 
 # the logging things
 import logging
+
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 LOGGER = logging.getLogger(__name__)
 
-from pyrogram import (
-    Client
-)
-from pyrogram.errors import (
-    ChannelInvalid
-)
+from pyrogram import Client
+from pyrogram.errors import ChannelInvalid
 from tobrot.helper_funcs.run_shell_command import run_command
 
 
-async def copy_via_rclone(
-    src: str,
-    remote_name: str,
-    remote_dir: str,
-    conf_file: str
-):
+async def copy_via_rclone(src: str, remote_name: str, remote_dir: str, conf_file: str):
     if os.path.isdir(src):
         remote_dir = f"{remote_dir}/{src}"
     command_to_exec = [
@@ -52,9 +43,12 @@ async def copy_via_rclone(
         f"{remote_name}:{remote_dir}",
         f"--config={conf_file}",
         "--fast-list",
-        "--transfers", "18",
-        "--checkers", "10",
-        "--drive-chunk-size", "64M"
+        "--transfers",
+        "18",
+        "--checkers",
+        "10",
+        "--drive-chunk-size",
+        "64M",
     ]
     LOGGER.info(command_to_exec)
     t_response, e_response = await run_command(command_to_exec)
@@ -63,10 +57,7 @@ async def copy_via_rclone(
     LOGGER.info(t_response)
     # https://github.com/rg3/youtube-dl/issues/2630#issuecomment-38635239
     remote_file_link = await r_clone_extract_link_s(
-        re.escape(src),
-        remote_name,
-        remote_dir,
-        conf_file
+        re.escape(src), remote_name, remote_dir, conf_file
     )
     LOGGER.info(remote_file_link)
     return remote_file_link
@@ -76,17 +67,12 @@ async def get_r_clone_config(message_link: str, py_client: Client) -> str:
     chat_id, message_id = extract_c_m_ids(message_link)
     try:
         conf_mesg = await py_client.get_messages(
-            chat_id=chat_id,
-            message_ids=message_id
+            chat_id=chat_id, message_ids=message_id
         )
     except ChannelInvalid:
-        LOGGER.info(
-            "invalid RClone config URL. this is NOT an ERROR"
-        )
+        LOGGER.info("invalid RClone config URL. this is NOT an ERROR")
         return None
-    down_conf_n = await py_client.download_media(
-        message=conf_mesg
-    )
+    down_conf_n = await py_client.download_media(message=conf_mesg)
     return down_conf_n
 
 
@@ -108,17 +94,14 @@ def extract_c_m_ids(message_link: str) -> (Union[str, int], int):
 
 
 async def r_clone_extract_link_s(
-    src_file_name: str,
-    remote_name: str,
-    remote_dir: str,
-    conf_file: str
+    src_file_name: str, remote_name: str, remote_dir: str, conf_file: str
 ):
     # TODO: Need to fix file linking for individual files
     command_to_exec = [
         "rclone",
         "link",
         f"{remote_name}:{remote_dir}",
-        f"--config={conf_file}"
+        f"--config={conf_file}",
     ]
     LOGGER.info(command_to_exec)
     t_response, e_response = await run_command(command_to_exec)
