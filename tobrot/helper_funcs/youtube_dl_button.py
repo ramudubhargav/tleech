@@ -13,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 import os
 import shutil
 from datetime import datetime
-import youtube_dlc
+import yt_dlp
 from tobrot import (
     DOWNLOAD_LOCATION,
     TG_MAX_FILE_SIZE
@@ -116,10 +116,10 @@ async def youtube_dl_call_back(bot, update):
         })
 
     start = datetime.now()
-    with youtube_dlc.YoutubeDL(ytdl_opts) as ytdl:
+    with yt_dlp.YoutubeDL(ytdl_opts) as ytdl:
         try:
             info = ytdl.extract_info(youtube_dl_url, download=True, ie_key=extractor_key)
-        except youtube_dlc.utils.DownloadError as ytdl_error:
+        except yt_dlp.utils.DownloadError as ytdl_error:
             await update.message.edit_caption(caption=str(ytdl_error))
             return False, None
     if info:

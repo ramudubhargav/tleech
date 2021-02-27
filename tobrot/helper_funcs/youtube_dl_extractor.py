@@ -3,7 +3,7 @@
 # (c) PublicLeech Author(s)
 
 from tobrot.helper_funcs.display_progress import humanbytes
-import youtube_dlc
+import yt_dlp
 from pykeyboard import InlineKeyboard
 from pyrogram.types import InlineKeyboardButton
 
@@ -21,10 +21,10 @@ async def extract_youtube_dl_formats(url, yt_dl_user_name, yt_dl_pass_word, user
         info_dict.update({
             "geo_bypass_country": "IN",
         })
-    with youtube_dlc.YoutubeDL(info_dict) as ytdl:
+    with yt_dlp.YoutubeDL(info_dict) as ytdl:
         try:
             info = ytdl.extract_info(url, download=False)
-        except youtube_dlc.utils.DownloadError as ytdl_error:
+        except yt_dlp.utils.DownloadError as ytdl_error:
             return None, str(ytdl_error), None
 
     if info:

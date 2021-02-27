@@ -32,7 +32,7 @@ async def get_markup(message: Message):
                 callback_data=("leech")
                 ),
             InlineKeyboardButton(
-                "youtube-dlc",
+                "yt-dlp",
                 callback_data=("ytdl")
                 ))
     ikeyboard.row(
@@ -41,7 +41,7 @@ async def get_markup(message: Message):
                 callback_data=("leecha")
                 ),
             InlineKeyboardButton(
-                "youtube-dlc archive",
+                "yt-dlp archive",
                 callback_data=("ytdla")
                 ))
     if R_CLONE_CONF_URI:
