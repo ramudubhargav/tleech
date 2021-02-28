@@ -6,10 +6,9 @@ import asyncio
 import configparser
 import os
 from pyrogram.errors import MessageNotModified, FloodWait
-from tobrot import LOGGER
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 from tobrot.helper_funcs.create_compressed_archive import create_archive
-from tobrot import EDIT_SLEEP_TIME_OUT, R_CLONE_CONF_URI, R_CLONE_DEST
+from tobrot import LOGGER, EDIT_SLEEP_TIME_OUT, R_CLONE_CONF_URI, R_CLONE_DEST
 from tobrot.helper_funcs.r_clone import get_r_clone_config, copy_via_rclone
 
 

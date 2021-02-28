@@ -2,14 +2,6 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
 import configparser
 from pykeyboard import InlineKeyboard
 from pyrogram.types import InlineKeyboardButton, Message
@@ -20,12 +12,12 @@ from tobrot.helper_funcs.r_clone import get_r_clone_config
 async def get_markup(message: Message):
     ikeyboard = InlineKeyboard()
     ikeyboard.row(
-        InlineKeyboardButton("leech", callback_data=("leech")),
-        InlineKeyboardButton("yt-dlp", callback_data=("ytdl")),
+        InlineKeyboardButton("leech", callback_data="leech"),
+        InlineKeyboardButton("yt-dlp", callback_data="ytdl"),
     )
     ikeyboard.row(
-        InlineKeyboardButton("leech archive", callback_data=("leecha")),
-        InlineKeyboardButton("yt-dlp archive", callback_data=("ytdla")),
+        InlineKeyboardButton("leech archive", callback_data="leecha"),
+        InlineKeyboardButton("yt-dlp archive", callback_data="ytdla"),
     )
     if R_CLONE_CONF_URI:
         r_clone_conf_file = await get_r_clone_config(R_CLONE_CONF_URI, message._client)

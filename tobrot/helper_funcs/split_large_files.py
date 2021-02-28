@@ -2,22 +2,12 @@
 # -*- coding: utf-8 -*-
 # (c) Akshay C / Shrimadhav U K
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-LOGGER = logging.getLogger(__name__)
-
-
 import os
 import time
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 
-from tobrot import MAX_TG_SPLIT_FILE_SIZE, SP_LIT_ALGO_RITH_M
+from tobrot import LOGGER, MAX_TG_SPLIT_FILE_SIZE, SP_LIT_ALGO_RITH_M
 from tobrot.helper_funcs.run_shell_command import run_command
 
 
@@ -40,7 +30,7 @@ async def split_large_files(input_file):
         LOGGER.info(total_duration)
         total_file_size = os.path.getsize(input_file)
         LOGGER.info(total_file_size)
-        minimum_duration = (total_duration / total_file_size) * (MAX_TG_SPLIT_FILE_SIZE)
+        minimum_duration = (total_duration / total_file_size) * MAX_TG_SPLIT_FILE_SIZE
         # casting to int cuz float Time Stamp can cause errors
         minimum_duration = int(minimum_duration)
 

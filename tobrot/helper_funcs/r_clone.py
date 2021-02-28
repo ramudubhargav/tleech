@@ -20,16 +20,9 @@ import os
 import re
 from typing import Union
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
 from pyrogram import Client
 from pyrogram.errors import ChannelInvalid
+from tobrot import LOGGER
 from tobrot.helper_funcs.run_shell_command import run_command
 
 

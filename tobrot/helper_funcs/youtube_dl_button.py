@@ -2,19 +2,11 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-LOGGER = logging.getLogger(__name__)
-
 import os
 import shutil
 from datetime import datetime
 import yt_dlp
-from tobrot import DOWNLOAD_LOCATION, TG_MAX_FILE_SIZE
+from tobrot import LOGGER, DOWNLOAD_LOCATION, TG_MAX_FILE_SIZE
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 

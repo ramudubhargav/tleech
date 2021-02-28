@@ -2,19 +2,9 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K / Akshay C
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-LOGGER = logging.getLogger(__name__)
-
-
 import os
 
-from tobrot import aria2, DOWNLOAD_LOCATION
+from tobrot import aria2, LOGGER, DOWNLOAD_LOCATION
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.download_aria_p_n import (
     call_apropriate_function,

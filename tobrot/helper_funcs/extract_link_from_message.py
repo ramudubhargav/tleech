@@ -2,20 +2,11 @@
 # -*- coding: utf-8 -*-
 # (c) Shrimadhav U K
 
-# the logging things
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-LOGGER = logging.getLogger(__name__)
-
 import aiohttp
 
 from pyrogram.types import MessageEntity
 
-from tobrot import TG_OFFENSIVE_API
+from tobrot import LOGGER, TG_OFFENSIVE_API
 
 
 def extract_url_from_entity(entities: MessageEntity, text: str):
