@@ -39,10 +39,9 @@ async def leech_commandi_f(client, message):
     m_sgra = " ".join(message.command[1:])
     # get link from the incoming message
     dl_url, cf_name, _, _ = await extract_link(message.reply_to_message, "LEECH")
-    LOGGER.info(dl_url)
-    LOGGER.info(cf_name)
+    LOGGER.info(f"extracted /leech links {dl_url}")
+    # LOGGER.info(cf_name)
     if dl_url is not None:
-        await m_.edit_text("extracting links")
         current_user_id = message.reply_to_message.from_user.id
         # create an unique directory
         new_download_location = os.path.join(
@@ -54,7 +53,7 @@ async def leech_commandi_f(client, message):
         if not os.path.isdir(new_download_location):
             os.makedirs(new_download_location)
         if "_" in m_sgra:
-            await m_.edit_text("trying to download")
+            LOGGER.info("rclone upload mode")
             # try to download the "link"
             sagtus, err_message = await fake_etairporpa_call(
                 aria2,
@@ -72,7 +71,7 @@ async def leech_commandi_f(client, message):
             is_zip = False
             if "a" in m_sgra:
                 is_zip = True
-            await m_.edit_text("trying to download")
+            LOGGER.info("tg upload mode")
             # try to download the "link"
             sagtus, err_message = await call_apropriate_function(
                 aria2, dl_url, new_download_location, m_, is_zip
@@ -90,10 +89,9 @@ async def incoming_youtube_dl_f(client, message):
     dl_url, cf_name, yt_dl_user_name, yt_dl_pass_word = await extract_link(
         message.reply_to_message, "YTDL"
     )
-    LOGGER.info(dl_url)
-    LOGGER.info(cf_name)
+    LOGGER.info(f"extracted /ytdl links {dl_url}")
+    # LOGGER.info(cf_name)
     if dl_url is not None:
-        await i_m_sefg.edit_text("extracting links")
         current_user_id = message.from_user.id
         # create an unique directory
         user_working_dir = os.path.join(
@@ -104,6 +102,7 @@ async def incoming_youtube_dl_f(client, message):
         # create download directory, if not exist
         if not os.path.isdir(user_working_dir):
             os.makedirs(user_working_dir)
+        LOGGER.info("fetching youtube_dl formats")
         # list the formats, and display in button markup formats
         thumb_image, text_message, reply_markup = await extract_youtube_dl_formats(
             dl_url,
