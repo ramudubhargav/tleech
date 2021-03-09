@@ -13,7 +13,8 @@ from tobrot.helper_funcs.display_progress import progress_for_pyrogram, humanbyt
 from tobrot.helper_funcs.help_Nekmo_ffmpeg import take_screen_shot
 from tobrot.helper_funcs.split_large_files import split_large_files
 from tobrot.helper_funcs.copy_similar_file import copy_file
-from tobrot import LOGGER, TG_MAX_FILE_SIZE, EDIT_SLEEP_TIME_OUT, DOWNLOAD_LOCATION
+from tobrot import LOGGER
+from tobrot.config import Config
 
 
 async def upload_to_tg(
@@ -61,7 +62,7 @@ async def upload_to_tg(
                 caption_str,
             )
     else:
-        if os.path.getsize(local_file_name) > TG_MAX_FILE_SIZE:
+        if os.path.getsize(local_file_name) > Config.TG_MAX_FILE_SIZE:
             LOGGER.info("TODO")
             d_f_s = humanbytes(os.path.getsize(local_file_name))
             i_m_s_g = await message.reply_text(
@@ -103,12 +104,12 @@ async def upload_to_tg(
 async def upload_single_file(
     message, local_file_name, caption_str, from_user, edit_media
 ):
-    await asyncio.sleep(EDIT_SLEEP_TIME_OUT)
+    await asyncio.sleep(Config.EDIT_SLEEP_TIME_OUT)
     sent_message = None
     start_time = time.time()
     #
     thumbnail_location = os.path.join(
-        DOWNLOAD_LOCATION, "thumbnails", str(from_user) + ".jpg"
+        Config.DOWNLOAD_LOCATION, "thumbnails", str(from_user) + ".jpg"
     )
     LOGGER.info(thumbnail_location)
     #

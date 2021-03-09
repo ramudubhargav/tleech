@@ -5,7 +5,7 @@
 import math
 import time
 
-from tobrot import FINISHED_PROGRESS_STR, UN_FINISHED_PROGRESS_STR
+from tobrot.config import Config
 
 
 async def progress_for_pyrogram(current, total, ud_type, message, start):
@@ -25,10 +25,15 @@ async def progress_for_pyrogram(current, total, ud_type, message, start):
         estimated_total_time = time_formatter(time_to_completion)
 
         progress = "[{}{}] \nProgress: {}%".format(
-            "".join([FINISHED_PROGRESS_STR for _ in range(math.floor(percentage / 5))]),
             "".join(
                 [
-                    UN_FINISHED_PROGRESS_STR
+                    Config.FINISHED_PROGRESS_STR
+                    for _ in range(math.floor(percentage / 5))
+                ]
+            ),
+            "".join(
+                [
+                    Config.UN_FINISHED_PROGRESS_STR
                     for _ in range(20 - math.floor(percentage / 5))
                 ]
             ),

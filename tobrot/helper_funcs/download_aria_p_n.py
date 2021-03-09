@@ -6,9 +6,10 @@ import asyncio
 import configparser
 import os
 from pyrogram.errors import MessageNotModified, FloodWait
+from tobrot import LOGGER
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 from tobrot.helper_funcs.create_compressed_archive import create_archive
-from tobrot import LOGGER, EDIT_SLEEP_TIME_OUT, R_CLONE_CONF_URI, R_CLONE_DEST
+from tobrot.config import Config
 from tobrot.helper_funcs.r_clone import get_r_clone_config, copy_via_rclone
 
 
@@ -105,7 +106,7 @@ async def fake_etairporpa_call(
     to_upload_file = file.name
     # -_-
     r_clone_conf_file = await get_r_clone_config(
-        R_CLONE_CONF_URI, sent_message_to_update_tg_p._client
+        Config.R_CLONE_CONF_URI, sent_message_to_update_tg_p._client
     )
     if r_clone_conf_file is not None:  # how? even :\
         config = configparser.ConfigParser()
@@ -118,7 +119,7 @@ async def fake_etairporpa_call(
         remote_file_link = await copy_via_rclone(
             to_upload_file,
             required_remote,
-            R_CLONE_DEST,  # rclone destination folder
+            Config.R_CLONE_DEST,  # rclone destination folder
             r_clone_conf_file,
         )
         await sent_message_to_update_tg_p.reply_text(
@@ -246,7 +247,7 @@ async def check_progress_for_dl(aria2, gid, event, previous_message):
                 msg = file.error_message
                 await event.edit(f"`{msg}`")
                 return False
-            await asyncio.sleep(EDIT_SLEEP_TIME_OUT)
+            await asyncio.sleep(Config.EDIT_SLEEP_TIME_OUT)
             return await check_progress_for_dl(aria2, gid, event, previous_message)
         else:
             await event.edit(f"File Downloaded Successfully: <code>{file.name}</code>")

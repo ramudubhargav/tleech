@@ -6,7 +6,8 @@ import os
 import shutil
 from datetime import datetime
 import yt_dlp
-from tobrot import LOGGER, DOWNLOAD_LOCATION, TG_MAX_FILE_SIZE
+from tobrot import LOGGER
+from tobrot.config import Config
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 
@@ -23,7 +24,7 @@ async def youtube_dl_call_back(bot, update):
     current_touched_user_id = update.from_user.id
 
     user_working_dir = os.path.join(
-        DOWNLOAD_LOCATION,
+        Config.DOWNLOAD_LOCATION,
         str(current_user_id),
         str(update.message.reply_to_message.message_id),
     )
@@ -61,7 +62,7 @@ async def youtube_dl_call_back(bot, update):
         "nooverwrites": True,
         "continuedl": True,
         "noplaylist": True,
-        "max_filesize": TG_MAX_FILE_SIZE,
+        "max_filesize": Config.TG_MAX_FILE_SIZE,
     }
     if yt_dl_user_name and yt_dl_pass_word:
         ytdl_opts.update(

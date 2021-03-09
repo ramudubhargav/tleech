@@ -9,7 +9,8 @@ import shutil
 import sys
 import time
 import traceback
-from tobrot import aria2, BOT_START_TIME, LOGGER, LOG_FILE_ZZGEVC, MAX_MESSAGE_LENGTH
+from tobrot import aria2, BOT_START_TIME, LOGGER
+from tobrot.config import Config
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
 from tobrot.dinmamoc import Commandi
 from tobrot.amocmadin import Loilacaztion
@@ -104,7 +105,7 @@ async def exec_message_f(client, message):
         f"<b>return:</b> <code>{process.returncode}</code>"
     )
 
-    if len(OUTPUT) > MAX_MESSAGE_LENGTH:
+    if len(OUTPUT) > Config.MAX_MESSAGE_LENGTH:
         with open("exec.text", "w+", encoding="utf8") as out_file:
             out_file.write(str(OUTPUT))
         await client.send_document(
@@ -149,7 +150,7 @@ async def save_rclone_conf_f(client, message):
 
 
 async def upload_log_file(client, message):
-    await message.reply_document(LOG_FILE_ZZGEVC)
+    await message.reply_document(Config.LOG_FILE_ZZGEVC)
 
 
 async def eval_message_f(client, message):
@@ -187,7 +188,7 @@ async def eval_message_f(client, message):
     final_output += "\n\n<b>OUTPUT</b>:\n"
     final_output += f"<code>{evaluation}</code>\n"
 
-    if len(final_output) > MAX_MESSAGE_LENGTH:
+    if len(final_output) > Config.MAX_MESSAGE_LENGTH:
         with open("eval.text", "w+", encoding="utf8") as out_file:
             out_file.write(str(final_output))
         await ismgese.reply_document(document="eval.text", caption=cmd)

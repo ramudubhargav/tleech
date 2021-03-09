@@ -5,17 +5,8 @@
 
 import os
 
-from tobrot import (
-    APP_ID,
-    API_HASH,
-    AUTH_CHANNEL,
-    DOWNLOAD_LOCATION,
-    LOGGER,
-    SHOULD_USE_BUTTONS,
-    TG_BOT_TOKEN,
-    DIS_ABLE_ST_GFC_COMMAND_I,
-    SUDO_USERS,
-)
+from tobrot import LOGGER
+from tobrot.config import Config
 from pyrogram import Client, filters
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from tobrot.plugins.new_join_fn import new_join_f, help_message_f
@@ -42,16 +33,16 @@ from tobrot.dinmamoc import Commandi
 
 if __name__ == "__main__":
     # create download directory, if not exist
-    if not os.path.isdir(DOWNLOAD_LOCATION):
-        os.makedirs(DOWNLOAD_LOCATION)
+    if not os.path.isdir(Config.DOWNLOAD_LOCATION):
+        os.makedirs(Config.DOWNLOAD_LOCATION)
     #
     app = Client(
         ":memory:",
-        bot_token=TG_BOT_TOKEN,
-        api_id=APP_ID,
-        api_hash=API_HASH,
+        bot_token=Config.TG_BOT_TOKEN,
+        api_id=Config.APP_ID,
+        api_hash=Config.API_HASH,
         workers=343,
-        workdir=DOWNLOAD_LOCATION,
+        workdir=Config.DOWNLOAD_LOCATION,
     )
     #
     app.set_parse_mode("html")
@@ -59,38 +50,42 @@ if __name__ == "__main__":
     # PURGE command
     incoming_purge_message_handler = MessageHandler(
         incoming_purge_message_f,
-        filters=filters.command([Commandi.PURGE]) & filters.chat(chats=AUTH_CHANNEL),
+        filters=filters.command([Commandi.PURGE])
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(incoming_purge_message_handler)
 
     # STATUS command
     status_message_handler = MessageHandler(
         status_message_f,
-        filters=filters.command([Commandi.STATUS]) & filters.chat(chats=AUTH_CHANNEL),
+        filters=filters.command([Commandi.STATUS])
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(status_message_handler)
 
     # CANCEL command
     cancel_message_handler = MessageHandler(
         cancel_message_f,
-        filters=filters.command([Commandi.CANCEL]) & filters.chat(chats=AUTH_CHANNEL),
+        filters=filters.command([Commandi.CANCEL])
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(cancel_message_handler)
 
-    if not SHOULD_USE_BUTTONS:
+    if not Config.SHOULD_USE_BUTTONS:
         LOGGER.info("using COMMANDi mode")
         # LEECH command
         incoming_message_handler = MessageHandler(
             leech_commandi_f,
             filters=filters.command([Commandi.LEECH])
-            & filters.chat(chats=AUTH_CHANNEL),
+            & filters.chat(chats=Config.AUTH_CHANNEL),
         )
         app.add_handler(incoming_message_handler)
 
         # YTDL command
         incoming_youtube_dl_handler = MessageHandler(
             incoming_youtube_dl_f,
-            filters=filters.command([Commandi.YTDL]) & filters.chat(chats=AUTH_CHANNEL),
+            filters=filters.command([Commandi.YTDL])
+            & filters.chat(chats=Config.AUTH_CHANNEL),
         )
         app.add_handler(incoming_youtube_dl_handler)
     else:
@@ -99,7 +94,7 @@ if __name__ == "__main__":
         # in the AUTH_CHANNELs
         incoming_message_handler = MessageHandler(
             incoming_message_f,
-            filters=message_fliter & filters.chat(chats=AUTH_CHANNEL),
+            filters=message_fliter & filters.chat(chats=Config.AUTH_CHANNEL),
         )
         app.add_handler(incoming_message_handler)
 
@@ -109,43 +104,47 @@ if __name__ == "__main__":
     call_back_button_handler = CallbackQueryHandler(button)
     app.add_handler(call_back_button_handler)
 
-    if DIS_ABLE_ST_GFC_COMMAND_I:
+    if Config.DIS_ABLE_ST_GFC_COMMAND_I:
         exec_message_handler = MessageHandler(
             exec_message_f,
-            filters=filters.command([Commandi.EXEC]) & filters.user(users=SUDO_USERS),
+            filters=filters.command([Commandi.EXEC])
+            & filters.user(users=Config.SUDO_USERS),
         )
         app.add_handler(exec_message_handler)
 
         eval_message_handler = MessageHandler(
             eval_message_f,
-            filters=filters.command([Commandi.EVAL]) & filters.user(users=SUDO_USERS),
+            filters=filters.command([Commandi.EVAL])
+            & filters.user(users=Config.SUDO_USERS),
         )
         app.add_handler(eval_message_handler)
 
         # MEMEs COMMANDs
         upload_document_handler = MessageHandler(
             upload_document_f,
-            filters=filters.command([Commandi.UPLOAD]) & filters.user(users=SUDO_USERS),
+            filters=filters.command([Commandi.UPLOAD])
+            & filters.user(users=Config.SUDO_USERS),
         )
         app.add_handler(upload_document_handler)
 
     # HELP command
     help_text_handler = MessageHandler(
         help_message_f,
-        filters=filters.command([Commandi.HELP]) & filters.chat(chats=AUTH_CHANNEL),
+        filters=filters.command([Commandi.HELP])
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(help_text_handler)
 
     # not AUTH CHANNEL users
     new_join_handler = MessageHandler(
-        new_join_f, filters=~filters.chat(chats=AUTH_CHANNEL)
+        new_join_f, filters=~filters.chat(chats=Config.AUTH_CHANNEL)
     )
     app.add_handler(new_join_handler)
 
     # welcome MESSAGE
     group_new_join_handler = MessageHandler(
         help_message_f,
-        filters=filters.chat(chats=AUTH_CHANNEL) & filters.new_chat_members,
+        filters=filters.chat(chats=Config.AUTH_CHANNEL) & filters.new_chat_members,
     )
     app.add_handler(group_new_join_handler)
 
@@ -153,7 +152,7 @@ if __name__ == "__main__":
     save_thumb_nail_handler = MessageHandler(
         save_thumb_nail,
         filters=filters.command([Commandi.SAVETHUMBNAIL])
-        & filters.chat(chats=AUTH_CHANNEL),
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(save_thumb_nail_handler)
 
@@ -161,7 +160,7 @@ if __name__ == "__main__":
     clear_thumb_nail_handler = MessageHandler(
         clear_thumb_nail,
         filters=filters.command([Commandi.CLEARTHUMBNAIL])
-        & filters.chat(chats=AUTH_CHANNEL),
+        & filters.chat(chats=Config.AUTH_CHANNEL),
     )
     app.add_handler(clear_thumb_nail_handler)
 
@@ -169,7 +168,7 @@ if __name__ == "__main__":
     save_rclone_conf_handler = MessageHandler(
         save_rclone_conf_f,
         filters=filters.command([Commandi.GET_RCLONE_CONF_URI])
-        & filters.user(users=SUDO_USERS),
+        & filters.user(users=Config.SUDO_USERS),
     )
     app.add_handler(save_rclone_conf_handler)
 
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     upload_log_f_handler = MessageHandler(
         upload_log_file,
         filters=filters.command([Commandi.UPLOAD_LOG_FILE])
-        & filters.user(users=SUDO_USERS),
+        & filters.user(users=Config.SUDO_USERS),
     )
     app.add_handler(upload_log_f_handler)
 

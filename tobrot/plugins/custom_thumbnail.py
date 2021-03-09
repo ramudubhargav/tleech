@@ -2,12 +2,12 @@
 
 import os
 from PIL import Image
-from tobrot import DOWNLOAD_LOCATION
+from tobrot.config import Config
 from tobrot.amocmadin import Loilacaztion
 
 
 async def save_thumb_nail(_, message):
-    thumbnail_location = os.path.join(DOWNLOAD_LOCATION, "thumbnails")
+    thumbnail_location = os.path.join(Config.DOWNLOAD_LOCATION, "thumbnails")
     thumb_image_path = os.path.join(
         thumbnail_location, str(message.from_user.id) + ".jpg"
     )
@@ -31,7 +31,7 @@ async def save_thumb_nail(_, message):
 
 
 async def clear_thumb_nail(_, message):
-    thumbnail_location = os.path.join(DOWNLOAD_LOCATION, "thumbnails")
+    thumbnail_location = os.path.join(Config.DOWNLOAD_LOCATION, "thumbnails")
     thumb_image_path = os.path.join(
         thumbnail_location, str(message.from_user.id) + ".jpg"
     )

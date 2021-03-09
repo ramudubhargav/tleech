@@ -5,7 +5,7 @@
 import configparser
 from pykeyboard import InlineKeyboard
 from pyrogram.types import InlineKeyboardButton, Message
-from tobrot import R_CLONE_CONF_URI
+from tobrot.config import Config
 from tobrot.helper_funcs.r_clone import get_r_clone_config
 
 
@@ -19,8 +19,10 @@ async def get_markup(message: Message):
         InlineKeyboardButton("leech archive", callback_data="leecha"),
         InlineKeyboardButton("yt-dlp archive", callback_data="ytdla"),
     )
-    if R_CLONE_CONF_URI:
-        r_clone_conf_file = await get_r_clone_config(R_CLONE_CONF_URI, message._client)
+    if Config.R_CLONE_CONF_URI:
+        r_clone_conf_file = await get_r_clone_config(
+            Config.R_CLONE_CONF_URI, message._client
+        )
         if r_clone_conf_file is not None:
             config = configparser.ConfigParser()
             config.read(r_clone_conf_file)

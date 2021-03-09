@@ -18,7 +18,8 @@
 
 import os
 from pyrogram.types import Message
-from tobrot import aria2, LOGGER, DOWNLOAD_LOCATION
+from tobrot import aria2, LOGGER
+from tobrot.config import Config
 from tobrot.helper_funcs.download_aria_p_n import (
     call_apropriate_function,
     fake_etairporpa_call,
@@ -36,7 +37,7 @@ async def leech_btn_k(message: Message, cb_data: str):
     current_user_id = message.reply_to_message.from_user.id
     # create an unique directory
     new_download_location = os.path.join(
-        DOWNLOAD_LOCATION,
+        Config.DOWNLOAD_LOCATION,
         str(current_user_id),
         str(message.reply_to_message.message_id),
     )
@@ -86,7 +87,7 @@ async def ytdl_btn_k(message: Message):
         current_user_id = message.reply_to_message.from_user.id
         # create an unique directory
         user_working_dir = os.path.join(
-            DOWNLOAD_LOCATION,
+            Config.DOWNLOAD_LOCATION,
             str(current_user_id),
             str(message.reply_to_message.message_id),
         )

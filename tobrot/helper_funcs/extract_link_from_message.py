@@ -6,7 +6,8 @@ import aiohttp
 
 from pyrogram.types import MessageEntity
 
-from tobrot import LOGGER, TG_OFFENSIVE_API
+from tobrot import LOGGER
+from tobrot.config import Config
 
 
 def extract_url_from_entity(entities: MessageEntity, text: str):
@@ -17,7 +18,7 @@ def extract_url_from_entity(entities: MessageEntity, text: str):
         elif entity.type == "url":
             o = entity.offset
             l = entity.length
-            url = text[o:o + l]
+            url = text[o: o + l]
     return url
 
 
@@ -92,11 +93,11 @@ async def extract_link(message, type_o_request):
 
     # additional conditional check,
     # here to FILTER out BAD URLs
-    LOGGER.info(TG_OFFENSIVE_API)
-    if TG_OFFENSIVE_API is not None:
+    LOGGER.info(Config.TG_OFFENSIVE_API)
+    if Config.TG_OFFENSIVE_API is not None:
         try:
             async with aiohttp.ClientSession() as session:
-                api_url = TG_OFFENSIVE_API.format(
+                api_url = Config.TG_OFFENSIVE_API.format(
                     i=url, m=custom_file_name, t=type_o_request
                 )
                 LOGGER.info(api_url)

@@ -1,7 +1,6 @@
 .git*
 .dockerignore
 venv
-config.py
 __pycache__
 *.session
 *.log

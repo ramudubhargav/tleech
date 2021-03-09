@@ -7,7 +7,7 @@ import yt_dlp
 from pykeyboard import InlineKeyboard
 from pyrogram.types import InlineKeyboardButton
 
-from tobrot import DEF_THUMB_NAIL_VID_S
+from tobrot.config import Config
 
 
 async def extract_youtube_dl_formats(
@@ -40,7 +40,7 @@ async def extract_youtube_dl_formats(
         # LOGGER.info(thumb_image)
         # YouTube acts weirdly,
         # and not in the same way as Telegram
-        thumbnail = thumb_image if thumb_image else DEF_THUMB_NAIL_VID_S
+        thumbnail = thumb_image if thumb_image else Config.DEF_THUMB_NAIL_VID_S
 
         extractor_key = info.get("extractor_key", "Generic")
         duration = info.get("duration", None)
