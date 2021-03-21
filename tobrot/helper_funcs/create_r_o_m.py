@@ -32,7 +32,7 @@ async def get_markup(message: Message):
                 ikeyboard.row(
                     InlineKeyboardButton(
                         f"RClone LEECH {remote_name}",
-                        callback_data=(f"leech_rc_{it_r}").encode("UTF-8"),
+                        callback_data=f"leech_rc_{it_r}".encode("UTF-8"),
                     )
                 )
                 # ikeyboard.append(InlineKeyboardButton(
