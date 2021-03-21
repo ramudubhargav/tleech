@@ -5,6 +5,7 @@
 import asyncio
 import os
 import time
+from shutil import copyfile
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 from PIL import Image
@@ -12,9 +13,15 @@ from pyrogram.types import InputMediaDocument, InputMediaVideo, InputMediaAudio
 from tobrot.helper_funcs.display_progress import progress_for_pyrogram, humanbytes
 from tobrot.helper_funcs.help_Nekmo_ffmpeg import take_screen_shot
 from tobrot.helper_funcs.split_large_files import split_large_files
-from tobrot.helper_funcs.copy_similar_file import copy_file
 from tobrot import LOGGER
 from tobrot.config import Config
+
+
+async def copy_file(input_file, output_dir):
+    output_file = os.path.join(output_dir, str(time.time()) + ".jpg")
+    # https://stackoverflow.com/a/123212/4723940
+    copyfile(input_file, output_file)
+    return output_file
 
 
 async def upload_to_tg(
