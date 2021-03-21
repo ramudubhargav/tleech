@@ -12,7 +12,6 @@ from tobrot.helper_funcs.download_aria_p_n import (
     fake_etairporpa_call,
 )
 from tobrot.helper_funcs.youtube_dl_extractor import extract_youtube_dl_formats
-from tobrot.helper_funcs.admin_check import AdminCheck
 from tobrot.helper_funcs.create_r_o_m import get_markup
 from tobrot.helper_funcs.fix_tcerrocni_images import proc_ess_image_aqon
 
@@ -20,7 +19,7 @@ from tobrot.helper_funcs.fix_tcerrocni_images import proc_ess_image_aqon
 async def incoming_purge_message_f(client, message):
     """/purge command"""
     i_m_sefg2 = await message.reply_text("Purging...", quote=True)
-    if await AdminCheck(client, message.chat.id, message.from_user.id):
+    if message.from_user.id in Config.SUDO_USERS:
         try:
             aria2.remove_all(force=True)
             await i_m_sefg2.edit_text("Purged!")
