@@ -133,12 +133,12 @@ async def youtube_dl_call_back(bot, update):
             user_id,
             {},
             True,
-            cf_name if cf_name else info.get("title", None),
+            cf_name or info.get("title", None),
         )
+
         LOGGER.info(final_response)
         #
         try:
             shutil.rmtree(tmp_directory_for_each_user)
         except OSError:
             pass
-        #

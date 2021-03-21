@@ -64,9 +64,6 @@ async def leech_commandi_f(client, message):
                 # maybe IndexError / ValueError might occur,
                 # we don't know, yet!!
             )
-            if not sagtus:
-                # if FAILED, display the error message
-                await m_.edit_text(err_message)
         else:
             is_zip = False
             if "a" in m_sgra:
@@ -76,9 +73,9 @@ async def leech_commandi_f(client, message):
             sagtus, err_message = await call_apropriate_function(
                 aria2, dl_url, new_download_location, m_, is_zip
             )
-            if not sagtus:
-                # if FAILED, display the error message
-                await m_.edit_text(err_message)
+        if not sagtus:
+            # if FAILED, display the error message
+            await m_.edit_text(err_message)
 
 
 async def incoming_youtube_dl_f(client, message):

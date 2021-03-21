@@ -201,8 +201,6 @@ async def upload_single_file(
                         start_time,
                     ),
                 )
-            if thumb is not None:
-                os.remove(thumb)
         elif local_file_name.upper().endswith(("MP3", "M4A", "M4B", "FLAC", "WAV")):
             metadata = extractMetadata(createParser(local_file_name))
             duration = 0
@@ -256,8 +254,6 @@ async def upload_single_file(
                         start_time,
                     ),
                 )
-            if thumb is not None:
-                os.remove(thumb)
         else:
             thumb_image_path = None
             if os.path.isfile(thumbnail_location):
@@ -298,8 +294,8 @@ async def upload_single_file(
                         start_time,
                     ),
                 )
-            if thumb is not None:
-                os.remove(thumb)
+        if thumb is not None:
+            os.remove(thumb)
     except Exception as e:
         await message_for_progress_display.edit_text("**FAILED**\n" + str(e))
     else:

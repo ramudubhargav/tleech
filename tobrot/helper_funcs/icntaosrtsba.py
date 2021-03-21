@@ -57,9 +57,6 @@ async def leech_btn_k(message: Message, cb_data: str):
                 # maybe IndexError / ValueError might occur,
                 # we don't know, yet!!
             )
-            if not sagtus:
-                # if FAILED, display the error message
-                await message.edit_text(err_message)
         else:
             is_zip = False
             if "a" in cb_data:
@@ -69,9 +66,9 @@ async def leech_btn_k(message: Message, cb_data: str):
             sagtus, err_message = await call_apropriate_function(
                 aria2, dl_url, new_download_location, message, is_zip
             )
-            if not sagtus:
-                # if FAILED, display the error message
-                await message.edit_text(err_message)
+        if not sagtus:
+            # if FAILED, display the error message
+            await message.edit_text(err_message)
 
 
 async def ytdl_btn_k(message: Message):

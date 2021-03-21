@@ -267,13 +267,12 @@ async def check_progress_for_dl(aria2, gid, event, previous_message):
         LOGGER.info(str(e))
         if " not found" in str(e) or "'file'" in str(e):
             await event.edit("Download Canceled :\n<code>{}</code>".format(file.name))
-            return False
         else:
             LOGGER.info(str(e))
             await event.edit(
                 "<u>error</u> :\n<code>{}</code> \n\n#error".format(str(e))
             )
-            return False
+        return False
 
 
 # https://github.com/jaskaranSM/UniBorg/blob/6d35cf452bce1204613929d4da7530058785b6b1/stdplugins/aria.py#L136-L164

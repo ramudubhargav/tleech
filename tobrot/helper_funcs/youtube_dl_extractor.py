@@ -40,7 +40,7 @@ async def extract_youtube_dl_formats(
         # LOGGER.info(thumb_image)
         # YouTube acts weirdly,
         # and not in the same way as Telegram
-        thumbnail = thumb_image if thumb_image else Config.DEF_THUMB_NAIL_VID_S
+        thumbnail = thumb_image or Config.DEF_THUMB_NAIL_VID_S
 
         extractor_key = info.get("extractor_key", "Generic")
         duration = info.get("duration", None)
@@ -66,28 +66,26 @@ async def extract_youtube_dl_formats(
                 )
                 cb_string_video = f"video|{extractor_key}|{format_id}|{acodec}"
                 # GDrive gets special pass, acodec is not listed here, ie acodec=None
-                if extractor_key == "GoogleDrive":
-                    if format_id == "source":
-                        ikeyboard.row(
-                            InlineKeyboardButton(
-                                dipslay_str_uon, callback_data=cb_string_video
-                            )
+                if (
+                    extractor_key == "GoogleDrive"
+                    and format_id == "source"
+                    or extractor_key != "GoogleDrive"
+                    and format_string
+                    and "audio only" not in format_string
+                ):
+                    ikeyboard.row(
+                        InlineKeyboardButton(
+                            dipslay_str_uon, callback_data=cb_string_video
                         )
-                else:
-                    if format_string and "audio only" not in format_string:
-                        ikeyboard.row(
-                            InlineKeyboardButton(
-                                dipslay_str_uon, callback_data=cb_string_video
-                            )
+                    )
+                elif extractor_key != "GoogleDrive":
+                    # special weird case :\
+                    ikeyboard.row(
+                        InlineKeyboardButton(
+                            f"SVideo ({approx_file_size})",
+                            callback_data=cb_string_video,
                         )
-                    else:
-                        # special weird case :\
-                        ikeyboard.row(
-                            InlineKeyboardButton(
-                                f"SVideo ({approx_file_size})",
-                                callback_data=cb_string_video,
-                            )
-                        )
+                    )
             if duration:
                 ikeyboard.row(
                     InlineKeyboardButton(
@@ -110,6 +108,6 @@ async def extract_youtube_dl_formats(
                     "SVideo", callback_data=f"video|{extractor_key}|{format_id}|DL"
                 )
             )
-        # LOGGER.info(ikeyboard)
+            # LOGGER.info(ikeyboard)
     succss_mesg = "Select the desired format: 👇<br> <u>mentioned</u> <i>file size might be approximate</i>"
     return thumbnail, succss_mesg, ikeyboard
