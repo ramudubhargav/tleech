@@ -16,7 +16,7 @@ async def youtube_dl_call_back(bot, update):
     # LOGGER.info(update)
     cb_data = update.data
     # youtube_dl extractors
-    tg_send_type, extractor_key, youtube_dl_format, acodec = cb_data.split("|")
+    tg_send_type, extractor_key, youtube_dl_format, av_codec = cb_data.split("|")
     #
     current_user_id = update.message.reply_to_message.from_user.id
     current_message = update.message.reply_to_message
@@ -84,7 +84,7 @@ async def youtube_dl_call_back(bot, update):
                 "postprocessors": [
                     {
                         "key": "FFmpegExtractAudio",
-                        "preferredcodec": acodec,
+                        "preferredcodec": av_codec,
                         "preferredquality": youtube_dl_format,
                     },
                     {"key": "FFmpegMetadata"},
@@ -95,11 +95,9 @@ async def youtube_dl_call_back(bot, update):
         # recreating commit 20b0ef4 in a confusing way
         final_format = youtube_dl_format
         # GDrive check, it doesn't accept "bestaudio" value
-        if extractor_key == "GoogleDrive":
-            final_format = youtube_dl_format
-        elif extractor_key == "Youtube":
-            if acodec == "None":
-                final_format = f"{youtube_dl_format}+bestaudio"
+        # so its no need to append or do a condition check
+        if extractor_key == "Youtube" and av_codec == "none":
+            final_format = f"{youtube_dl_format}+bestaudio"
         ytdl_opts.update(
             {
                 "format": final_format,
