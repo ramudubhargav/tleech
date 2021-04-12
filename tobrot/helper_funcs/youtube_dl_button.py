@@ -10,6 +10,7 @@ from tobrot import LOGGER
 from tobrot.config import Config
 from tobrot.helper_funcs.extract_link_from_message import extract_link
 from tobrot.helper_funcs.upload_to_tg import upload_to_tg
+from tobrot.helper_funcs.youtube_dl_extractor import yt_extract_info
 
 
 async def youtube_dl_call_back(bot, update):
@@ -106,14 +107,16 @@ async def youtube_dl_call_back(bot, update):
         )
 
     start = datetime.now()
-    with yt_dlp.YoutubeDL(ytdl_opts) as ytdl:
-        try:
-            info = ytdl.extract_info(
-                youtube_dl_url, download=True, ie_key=extractor_key
-            )
-        except yt_dlp.utils.DownloadError as ytdl_error:
-            await update.message.edit_caption(caption=str(ytdl_error))
-            return False, None
+    try:
+        info = await yt_extract_info(
+            video_url=youtube_dl_url,
+            download=True,
+            ytdl_opts=ytdl_opts,
+            ie_key=extractor_key,
+        )
+    except yt_dlp.utils.DownloadError as ytdl_error:
+        await update.message.edit_caption(caption=str(ytdl_error))
+        return False, None
     if info:
         end_one = datetime.now()
         time_taken_for_download = (end_one - start).seconds
@@ -131,7 +134,7 @@ async def youtube_dl_call_back(bot, update):
             user_id,
             {},
             True,
-            cf_name or info.get("title", None),
+            cf_name or info.get("title", ""),
         )
 
         LOGGER.info(final_response)

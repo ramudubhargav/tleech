@@ -2,12 +2,34 @@
 # -*- coding: utf-8 -*-
 # (c) PublicLeech Author(s)
 
+import asyncio
+import functools
+from concurrent.futures import ThreadPoolExecutor
+
 from tobrot.helper_funcs.display_progress import humanbytes
 import yt_dlp
 from pykeyboard import InlineKeyboard
 from pyrogram.types import InlineKeyboardButton
 
 from tobrot.config import Config
+
+
+# https://stackoverflow.com/a/64506715
+def run_in_executor(_func):
+    @functools.wraps(_func)
+    async def wrapped(*args, **kwargs):
+        loop = asyncio.get_event_loop()
+        func = functools.partial(_func, *args, **kwargs)
+        return await loop.run_in_executor(executor=ThreadPoolExecutor(), func=func)
+
+    return wrapped
+
+
+@run_in_executor
+def yt_extract_info(video_url, download, ytdl_opts, ie_key):
+    with yt_dlp.YoutubeDL(ytdl_opts) as ytdl:
+        info = ytdl.extract_info(video_url, download=download, ie_key=ie_key)
+    return info
 
 
 async def extract_youtube_dl_formats(
@@ -27,11 +49,15 @@ async def extract_youtube_dl_formats(
                 "geo_bypass_country": "IN",
             }
         )
-    with yt_dlp.YoutubeDL(info_dict) as ytdl:
-        try:
-            info = ytdl.extract_info(url, download=False)
-        except yt_dlp.utils.DownloadError as ytdl_error:
-            return None, str(ytdl_error), None
+    try:
+        info = await yt_extract_info(
+            video_url=url,
+            download=False,
+            ytdl_opts=info_dict,
+            ie_key="Generic",
+        )
+    except yt_dlp.utils.DownloadError as ytdl_error:
+        return None, str(ytdl_error), None
 
     if info:
         ikeyboard = InlineKeyboard()
