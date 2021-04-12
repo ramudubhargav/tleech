@@ -1,8 +1,6 @@
 from tobrot.get_cfg import get_config
 
 
-
-
 class Config:
     # get a token from @BotFather
     TG_BOT_TOKEN = get_config("TG_BOT_TOKEN", should_prompt=True)
@@ -58,8 +56,6 @@ class Config:
     DIS_ABLE_ST_GFC_COMMAND_I = get_config("DIS_ABLE_ST_GFC_COMMAND_I", False)
     # array to store the users who will have control (permissions)
     # in the bot
-    SUDO_USERS = {
-        int(x) for x in get_config("SUDO_USERS", should_prompt=True).split()
-    }
+    SUDO_USERS = {int(x) for x in get_config("SUDO_USERS", should_prompt=True).split()}
 
     SUDO_USERS = list(SUDO_USERS)
