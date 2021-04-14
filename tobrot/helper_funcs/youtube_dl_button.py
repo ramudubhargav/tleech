@@ -105,6 +105,12 @@ async def youtube_dl_call_back(bot, update):
                 "postprocessors": [{"key": "FFmpegMetadata"}],
             }
         )
+    elif tg_send_type == "generic":
+        ytdl_opts.update(
+            {
+                "format": youtube_dl_format,
+            }
+        )
 
     start = datetime.now()
     try:
