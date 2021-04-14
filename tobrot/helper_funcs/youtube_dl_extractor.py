@@ -54,7 +54,7 @@ async def extract_youtube_dl_formats(
             video_url=url,
             download=False,
             ytdl_opts=info_dict,
-            ie_key="Generic",
+            ie_key=None,
         )
     except yt_dlp.utils.DownloadError as ytdl_error:
         return None, str(ytdl_error), None
